@@ -1,0 +1,10 @@
+{
+  "addr": "https://vault.lattica.xyz",
+  "project": "frontend",
+  "environments": {
+    "dev": "secret/data/dev/frontend",
+    "staging": "secret/data/staging/frontend",
+    "prod": "secret/data/prod/frontend"
+  },
+  "default_env": "dev"
+}
