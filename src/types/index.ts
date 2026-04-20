@@ -1,3 +1,9 @@
+export interface Token {
+	symbol: string;
+	name: string;
+	color: string;
+}
+
 export interface User {
 	id: number;
 	walletAddress: string;
