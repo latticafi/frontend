@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as EarnRouteImport } from './routes/earn'
 import { Route as BorrowRouteImport } from './routes/borrow'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketConditionIdRouteImport } from './routes/market.$conditionId'
 
 const EarnRoute = EarnRouteImport.update({
   id: '/earn',
@@ -28,35 +29,44 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketConditionIdRoute = MarketConditionIdRouteImport.update({
+  id: '/market/$conditionId',
+  path: '/market/$conditionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/borrow': typeof BorrowRoute
   '/earn': typeof EarnRoute
+  '/market/$conditionId': typeof MarketConditionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/borrow': typeof BorrowRoute
   '/earn': typeof EarnRoute
+  '/market/$conditionId': typeof MarketConditionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/borrow': typeof BorrowRoute
   '/earn': typeof EarnRoute
+  '/market/$conditionId': typeof MarketConditionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/borrow' | '/earn'
+  fullPaths: '/' | '/borrow' | '/earn' | '/market/$conditionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/borrow' | '/earn'
-  id: '__root__' | '/' | '/borrow' | '/earn'
+  to: '/' | '/borrow' | '/earn' | '/market/$conditionId'
+  id: '__root__' | '/' | '/borrow' | '/earn' | '/market/$conditionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BorrowRoute: typeof BorrowRoute
   EarnRoute: typeof EarnRoute
+  MarketConditionIdRoute: typeof MarketConditionIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/market/$conditionId': {
+      id: '/market/$conditionId'
+      path: '/market/$conditionId'
+      fullPath: '/market/$conditionId'
+      preLoaderRoute: typeof MarketConditionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BorrowRoute: BorrowRoute,
   EarnRoute: EarnRoute,
+  MarketConditionIdRoute: MarketConditionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

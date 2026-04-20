@@ -1,0 +1,110 @@
+name: deploy
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  staging:
+    if: |
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+      && !startsWith(github.event.workflow_run.head_commit.message, 'chore'))
+      || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: hashicorp/vault-action@v3
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: jwt
+          role: frontend-staging
+          jwtGithubAudience: https://github.com/latticafi
+          exportToken: true
+          secrets: |
+            secret/data/staging/frontend VITE_API_URL ;
+            secret/data/staging/frontend CLOUDFLARE_API_TOKEN ;
+            secret/data/staging/frontend CLOUDFLARE_ACCOUNT_ID
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+        env:
+          VITE_API_URL: ${{ env.VITE_API_URL }}
+
+      - name: deploy to cloudflare pages
+        run: pnpm exec wrangler pages deploy dist/ --project-name lattica-app-staging --branch main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: revoke token
+        if: always()
+        run: |
+          curl -sS -X POST \
+            -H "X-Vault-Token: ${VAULT_TOKEN}" \
+            "${{ secrets.VAULT_ADDR }}/v1/auth/token/revoke-self" || true
+
+  prod:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: hashicorp/vault-action@v3
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: jwt
+          role: frontend-prod
+          jwtGithubAudience: https://github.com/latticafi
+          exportToken: true
+          secrets: |
+            secret/data/prod/frontend VITE_API_URL ;
+            secret/data/prod/frontend CLOUDFLARE_API_TOKEN ;
+            secret/data/prod/frontend CLOUDFLARE_ACCOUNT_ID
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+        env:
+          VITE_API_URL: ${{ env.VITE_API_URL }}
+
+      - name: deploy to cloudflare pages
+        run: pnpm exec wrangler pages deploy dist/ --project-name lattica-app --branch main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: revoke token
+        if: always()
+        run: |
+          curl -sS -X POST \
+            -H "X-Vault-Token: ${VAULT_TOKEN}" \
+            "${{ secrets.VAULT_ADDR }}/v1/auth/token/revoke-self" || true

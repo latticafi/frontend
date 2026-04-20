@@ -15,11 +15,10 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@privy-io/react-auth": "^3.22.1",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-devtools": "^0.9.13",
-    "@tanstack/react-query": "^5.99.0",
-    "@tanstack/react-router": "^1.168.22",
+    "@tanstack/react-query": "^5.99.2",
+    "@tanstack/react-router": "^1.168.23",
     "@tanstack/react-router-devtools": "^1.166.13",
     "@tanstack/router-plugin": "^1.167.22",
     "class-variance-authority": "^0.7.1",
@@ -30,7 +29,9 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "viem": "^2.48.1",
+    "wagmi": "^3.6.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
@@ -51,6 +52,7 @@
     "typescript": "^5.9.3",
     "vite": "^7.3.2",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.4"
+    "vitest": "^4.1.4",
+    "wrangler": "^4.84.0"
   }
 }

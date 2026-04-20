@@ -2,21 +2,24 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { WalletButton } from "@/components/WalletButton";
+import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-	{ to: "/earn", label: "Earn" },
+	{ to: "/earn", label: "Lend" },
 	{ to: "/borrow", label: "Borrow" },
 ] as const;
 
-const NAV_LINK_CLASSES =
-	"px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground transition-colors";
-
-function NavLink({ to, label }: { to: string; label: string }) {
+function TabLink({ to, label }: { to: string; label: string }) {
 	return (
 		<Link
 			to={to}
-			className={NAV_LINK_CLASSES}
-			activeProps={{ className: "text-primary bg-primary/10" }}
+			className="rounded-xl px-5 py-2 text-[15px] font-semibold text-muted-foreground transition-colors hover:text-foreground"
+			activeProps={{
+				className: cn(
+					"rounded-xl px-5 py-2 text-[15px] font-semibold transition-colors",
+					"bg-[#212121] text-foreground",
+				),
+			}}
 		>
 			{label}
 		</Link>
@@ -27,30 +30,31 @@ export function Navbar() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	return (
-		<header className="sticky top-0 z-50 h-16 border-b border-border bg-card/95 backdrop-blur-md">
-			<nav className="flex h-full items-center justify-between px-6 md:px-8">
-				<div className="flex items-center gap-6">
-					<Link to="/earn" className="flex items-center gap-2.5">
-						<img src="/logo.svg" alt="Lattica" className="h-7 w-7" />
-						<span className="text-xl font-semibold tracking-tight">
+		<header className="sticky top-0 z-50 h-16 border-b border-white/4 bg-background/80 backdrop-blur-md">
+			<nav className="flex h-full items-center justify-between px-5 md:px-8">
+				<div className="flex items-center gap-5">
+					<Link
+						to="/"
+						className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-white/3"
+					>
+						<img src="/logo.svg" alt="Lattica" className="h-7 w-7 rounded-md" />
+						<span className="text-[17px] font-semibold tracking-tight">
 							Lattica
 						</span>
 					</Link>
 
-					<div className="hidden md:block h-5 w-px bg-white/[0.08]" />
-					<div className="hidden md:flex items-center gap-1">
+					<div className="hidden items-center gap-1 md:flex">
 						{NAV_LINKS.map((link) => (
-							<NavLink key={link.to} to={link.to} label={link.label} />
+							<TabLink key={link.to} to={link.to} label={link.label} />
 						))}
 					</div>
 				</div>
 
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-4">
 					<WalletButton />
-
 					<button
 						type="button"
-						className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+						className="p-2 text-muted-foreground transition-colors hover:text-foreground md:hidden"
 						onClick={() => setMobileMenuOpen((prev) => !prev)}
 						aria-label="Toggle menu"
 					>
@@ -64,9 +68,9 @@ export function Navbar() {
 			</nav>
 
 			{mobileMenuOpen && (
-				<div className="md:hidden border-b border-border bg-background/95 backdrop-blur-sm px-4 py-3 flex flex-col gap-1">
+				<div className="flex flex-col gap-1 border-b border-white/4 bg-background/95 px-4 py-3 backdrop-blur-sm md:hidden">
 					{NAV_LINKS.map((link) => (
-						<NavLink key={link.to} to={link.to} label={link.label} />
+						<TabLink key={link.to} to={link.to} label={link.label} />
 					))}
 				</div>
 			)}

@@ -1,29 +1,29 @@
-import { usePrivy } from "@privy-io/react-auth";
 import { Check, Copy, LogOut, Wallet } from "lucide-react";
 import { useState } from "react";
+import { useConnection, useDisconnect } from "wagmi";
 import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { useAuth } from "@/providers/AuthProvider";
 
 export function WalletModal() {
-	const { logout, user } = usePrivy();
+	const { address } = useConnection();
+	const disconnect = useDisconnect();
+	const { logout } = useAuth();
 	const [copied, setCopied] = useState(false);
 
-	const wallet = user?.wallet;
-
-	const email =
-		user?.email?.address ??
-		user?.google?.email ??
-		user?.twitter?.username ??
-		null;
-
 	const copyAddress = async () => {
-		if (!wallet) return;
-		await navigator.clipboard.writeText(wallet.address);
+		if (!address) return;
+		await navigator.clipboard.writeText(address);
 		setCopied(true);
 		setTimeout(() => setCopied(false), 1500);
+	};
+
+	const handleDisconnect = () => {
+		logout();
+		disconnect.mutate();
 	};
 
 	return (
@@ -40,9 +40,9 @@ export function WalletModal() {
 					<span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
 						Address
 					</span>
-					<div className="flex items-center justify-between gap-2 rounded-lg bg-secondary border border-white/[0.06] px-3 py-2.5">
+					<div className="flex items-center justify-between gap-2 rounded-lg bg-secondary border border-white/6 px-3 py-2.5">
 						<span className="text-sm font-mono text-foreground break-all">
-							{wallet?.address ?? "—"}
+							{address ?? "—"}
 						</span>
 						<button
 							type="button"
@@ -59,21 +59,10 @@ export function WalletModal() {
 					</div>
 				</div>
 
-				{email && (
-					<div className="flex flex-col gap-1.5">
-						<span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-							Account
-						</span>
-						<div className="rounded-lg bg-secondary border border-white/[0.06] px-3 py-2.5">
-							<span className="text-sm text-foreground">{email}</span>
-						</div>
-					</div>
-				)}
-
 				<button
 					type="button"
-					onClick={() => logout()}
-					className="flex items-center justify-center gap-2 rounded-lg border border-white/[0.06] px-3 py-2.5 text-sm text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors mt-1"
+					onClick={handleDisconnect}
+					className="flex items-center justify-center gap-2 rounded-lg border border-white/6 px-3 py-2.5 text-sm text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors mt-1"
 				>
 					<LogOut className="size-4" />
 					<span>Disconnect</span>

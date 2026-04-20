@@ -4,4 +4,6 @@ onlyBuiltDependencies:
   - esbuild
   - keccak
   - msw
+  - sharp
   - utf-8-validate
+  - workerd

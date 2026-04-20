@@ -20,7 +20,7 @@ export function StatCard({
 	variant = "default",
 }: StatCardProps) {
 	return (
-		<div className="rounded-2xl border border-white/[0.06] bg-[#262626] p-6 shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
+		<div className="rounded-2xl border border-white/6 bg-[#262626] p-6 shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
 			<p className="text-xs font-medium tracking-wide uppercase text-muted-foreground">
 				{label}
 			</p>

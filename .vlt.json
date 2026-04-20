@@ -1,5 +1,5 @@
 {
-  "addr": "https://vault.lattica.xyz",
+  "addr": "https://vault.lattica.finance",
   "project": "frontend",
   "environments": {
     "dev": "secret/data/dev/frontend",
