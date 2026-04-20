@@ -37,7 +37,7 @@ function RootComponent() {
 	return (
 		<div className="min-h-screen bg-background">
 			<Navbar />
-			<main className="mx-auto max-w-[1400px] px-4 py-8 md:px-6 lg:px-8">
+			<main className="mx-auto w-full max-w-[1500px] px-4 py-8 md:px-6 lg:px-10">
 				<Outlet />
 			</main>
 			<TanStackDevtools

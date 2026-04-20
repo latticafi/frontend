@@ -1,150 +1,203 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+	ArrowDown,
+	ChevronDown,
+	Expand,
+	Info,
+	Search,
+	Settings,
+	SlidersHorizontal,
+} from "lucide-react";
 import { useMemo, useState } from "react";
-import { type Column, DataTable } from "@/components/DataTable";
-import { SearchFilter } from "@/components/SearchFilter";
-import { StatCard } from "@/components/StatCard";
-import { TokenIcon } from "@/components/TokenIcon";
+import { CoinIcon } from "@/components/CoinIcon";
+import { CollateralAvatar } from "@/components/CollateralAvatar";
+import { ValueChip } from "@/components/ValueChip";
 import { MARKETS } from "@/data/placeholder";
-import { cn } from "@/lib/utils";
 import type { Market } from "@/types";
 
 export const Route = createFileRoute("/borrow")({
 	component: BorrowPage,
 });
 
-const columns: Column<Market>[] = [
-	{
-		key: "market",
-		header: "Market",
-		render: (row) => (
+const COLUMN_CLASS =
+	"grid grid-cols-[minmax(220px,1.4fr)_minmax(140px,1fr)_minmax(110px,0.8fr)_minmax(160px,1fr)_minmax(180px,1.1fr)_minmax(180px,1.1fr)_minmax(110px,0.7fr)] gap-6 items-center";
+
+function MarketRow({ market }: { market: Market }) {
+	return (
+		<Link
+			to="/market/$marketId"
+			params={{ marketId: market.slug }}
+			className={`${COLUMN_CLASS} border-t border-white/[0.04] px-8 py-5 text-[14px] transition-colors hover:bg-white/[0.02]`}
+		>
 			<div className="flex items-center gap-3">
-				<div className="flex -space-x-2">
-					<TokenIcon
-						symbol={row.loanAsset.symbol}
-						color={row.loanAsset.color}
-					/>
-					<TokenIcon
-						symbol={row.collateralAsset.symbol}
-						color={row.collateralAsset.color}
-					/>
+				<CollateralAvatar name={market.collateralName} size="lg" />
+				<div className="font-semibold leading-tight text-foreground">
+					{market.collateralName}
 				</div>
-				<span className="font-medium">
-					{row.loanAsset.symbol} / {row.collateralAsset.symbol}
+			</div>
+
+			<div className="flex items-center gap-2.5">
+				<CoinIcon token={market.loanAsset} size="md" />
+				<span className="font-semibold text-foreground">
+					{market.loanAsset.symbol}
 				</span>
 			</div>
-		),
-	},
-	{
-		key: "lltv",
-		header: "LLTV",
-		align: "right",
-		render: (row) => (
-			<span className="inline-flex items-center gap-1.5">
-				<span
-					className={cn(
-						"size-1.5 rounded-full",
-						row.lltv >= 90
-							? "bg-warning"
-							: row.lltv >= 80
-								? "bg-positive"
-								: "bg-muted-foreground",
-					)}
-				/>
-				{row.lltv}%
-			</span>
-		),
-	},
-	{
-		key: "totalSupply",
-		header: "Total Supply",
-		align: "right",
-		render: (row) => row.totalSupply,
-	},
-	{
-		key: "totalBorrow",
-		header: "Total Borrow",
-		align: "right",
-		render: (row) => row.totalBorrow,
-	},
-	{
-		key: "borrowApy",
-		header: "Borrow APY",
-		align: "right",
-		render: (row) => (
-			<span className="text-positive font-semibold">
-				{row.borrowApy.toFixed(2)}%
-			</span>
-		),
-	},
-	{
-		key: "utilization",
-		header: "Utilization",
-		align: "right",
-		render: (row) => {
-			const u = row.utilization;
-			const color =
-				u >= 85
-					? "text-warning"
-					: u >= 70
-						? "text-foreground"
-						: "text-positive";
-			return <span className={color}>{u.toFixed(1)}%</span>;
-		},
-	},
-];
+
+			<div className="font-semibold text-foreground">
+				{market.lltv.toFixed(2)}%
+			</div>
+
+			<div className="font-medium text-foreground/90">
+				{market.resolutionDate}
+			</div>
+
+			<div className="flex flex-col gap-1">
+				<span className="font-semibold text-foreground">
+					{market.totalMarketSize}
+				</span>
+				<ValueChip>{market.totalMarketSizeUsd}</ValueChip>
+			</div>
+
+			<div className="flex flex-col gap-1">
+				<span className="font-semibold text-foreground">
+					{market.availableLiquidity}
+				</span>
+				<ValueChip>{market.availableLiquidityUsd}</ValueChip>
+			</div>
+
+			<div className="font-semibold text-foreground">
+				{market.rate24h.toFixed(2)}%
+			</div>
+		</Link>
+	);
+}
+
+function HeaderCell({
+	label,
+	sortable = false,
+}: {
+	label: string;
+	sortable?: boolean;
+}) {
+	return (
+		<button
+			type="button"
+			className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-wider text-muted-foreground/70 transition-colors hover:text-foreground"
+		>
+			{label}
+			{sortable && <ArrowDown className="size-3" />}
+		</button>
+	);
+}
 
 function BorrowPage() {
 	const [search, setSearch] = useState("");
+	const [inWallet, setInWallet] = useState(false);
 
-	const filteredMarkets = useMemo(() => {
+	const filtered = useMemo(() => {
 		if (!search) return MARKETS;
-		const query = search.toLowerCase();
+		const q = search.toLowerCase();
 		return MARKETS.filter(
-			(market) =>
-				market.loanAsset.symbol.toLowerCase().includes(query) ||
-				market.collateralAsset.symbol.toLowerCase().includes(query),
+			(m) =>
+				m.collateralName.toLowerCase().includes(q) ||
+				m.loanAsset.symbol.toLowerCase().includes(q),
 		);
 	}, [search]);
 
 	return (
 		<div>
-			<h1 className="text-2xl font-semibold mb-2">Borrow</h1>
-			<p className="text-sm text-muted-foreground mb-8">
-				Supply collateral to borrow assets
-			</p>
-
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-				<StatCard
-					label="Total Borrowed"
-					value="$892M"
-					subValue="Across all markets"
-				/>
-				<StatCard
-					label="Average Borrow APY"
-					value="4.15%"
-					subValue="Weighted average"
-					variant="warning"
-				/>
-				<StatCard
-					label="Active Markets"
-					value="10"
-					subValue="Available to borrow"
-				/>
+			<div className="mb-8 flex items-center gap-3">
+				<h1 className="text-[40px] font-semibold tracking-tight text-foreground">
+					Markets
+				</h1>
+				<Info className="size-5 text-muted-foreground/60" />
 			</div>
 
-			<div className="mb-6">
-				<SearchFilter
-					placeholder="Search markets..."
-					value={search}
-					onChange={setSearch}
-				/>
-			</div>
+			<div className="overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#101011]">
+				<div className="flex flex-wrap items-center gap-4 border-b border-white/[0.04] px-8 py-5">
+					<label className="flex cursor-pointer items-center gap-2.5 text-[13px] font-medium text-foreground">
+						<span>In Wallet:</span>
+						<button
+							type="button"
+							role="switch"
+							aria-checked={inWallet}
+							onClick={() => setInWallet((prev) => !prev)}
+							className={`relative h-5 w-9 rounded-full transition-colors ${
+								inWallet ? "bg-primary" : "bg-[#2a2a2a]"
+							}`}
+						>
+							<span
+								className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+									inWallet ? "translate-x-[18px]" : "translate-x-0.5"
+								}`}
+							/>
+						</button>
+					</label>
 
-			<DataTable
-				columns={columns}
-				data={filteredMarkets}
-				keyExtractor={(row) => row.id}
-			/>
+					<button
+						type="button"
+						className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-medium text-foreground/80 transition-colors hover:bg-white/[0.04]"
+					>
+						<SlidersHorizontal className="size-4" />
+						Filter
+					</button>
+
+					<button
+						type="button"
+						className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-medium text-foreground/80 transition-colors hover:bg-white/[0.04]"
+					>
+						<ArrowDown className="size-4" />
+						Sort by Total Market Size
+						<ChevronDown className="size-3.5 text-muted-foreground" />
+					</button>
+
+					<div className="ml-auto flex items-center gap-3">
+						<div className="relative">
+							<Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
+							<input
+								type="text"
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								placeholder="Filter markets"
+								className="h-10 w-[260px] rounded-full border border-white/[0.06] bg-[#1a1a1a] pr-4 pl-10 text-[13px] text-foreground placeholder:text-muted-foreground/60 focus:border-white/[0.12] focus:outline-none"
+							/>
+						</div>
+						<button
+							type="button"
+							className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+						>
+							<Settings className="size-4" />
+						</button>
+						<button
+							type="button"
+							className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+						>
+							<Expand className="size-4" />
+						</button>
+					</div>
+				</div>
+
+				<div className={`${COLUMN_CLASS} px-8 py-4`}>
+					<HeaderCell label="Collateral" />
+					<HeaderCell label="Loan" />
+					<HeaderCell label="LLTV" />
+					<HeaderCell label="Resolution Date" />
+					<HeaderCell label="Total Market Size" sortable />
+					<HeaderCell label="Available Liquidity" />
+					<HeaderCell label="24H Rate" />
+				</div>
+
+				<div>
+					{filtered.map((market) => (
+						<MarketRow key={market.id} market={market} />
+					))}
+					{filtered.length === 0 && (
+						<div className="px-8 py-16 text-center text-sm text-muted-foreground">
+							No markets match your filter.
+						</div>
+					)}
+				</div>
+			</div>
 		</div>
 	);
 }

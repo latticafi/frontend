@@ -23,12 +23,19 @@ export interface User {
 
 export interface Market {
 	id: string;
+	slug: string;
+	collateralName: string;
+	collateralAddress: string;
+	collateralImage?: string;
 	loanAsset: Token;
-	collateralAsset: Token;
 	lltv: number;
-	totalSupply: string;
-	totalBorrow: string;
-	borrowApy: number;
-	supplyApy: number;
-	utilization: number;
+	resolutionDate: string;
+	totalMarketSize: string;
+	totalMarketSizeUsd: string;
+	availableLiquidity: string;
+	availableLiquidityUsd: string;
+	rate24h: number;
+	poolClosure: string;
+	currentRate: number;
+	source: "Polymarket";
 }

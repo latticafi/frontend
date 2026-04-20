@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as EarnRouteImport } from './routes/earn'
 import { Route as BorrowRouteImport } from './routes/borrow'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketMarketIdRouteImport } from './routes/market.$marketId'
 
 const EarnRoute = EarnRouteImport.update({
   id: '/earn',
@@ -28,35 +29,44 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketMarketIdRoute = MarketMarketIdRouteImport.update({
+  id: '/market/$marketId',
+  path: '/market/$marketId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/borrow': typeof BorrowRoute
   '/earn': typeof EarnRoute
+  '/market/$marketId': typeof MarketMarketIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/borrow': typeof BorrowRoute
   '/earn': typeof EarnRoute
+  '/market/$marketId': typeof MarketMarketIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/borrow': typeof BorrowRoute
   '/earn': typeof EarnRoute
+  '/market/$marketId': typeof MarketMarketIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/borrow' | '/earn'
+  fullPaths: '/' | '/borrow' | '/earn' | '/market/$marketId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/borrow' | '/earn'
-  id: '__root__' | '/' | '/borrow' | '/earn'
+  to: '/' | '/borrow' | '/earn' | '/market/$marketId'
+  id: '__root__' | '/' | '/borrow' | '/earn' | '/market/$marketId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BorrowRoute: typeof BorrowRoute
   EarnRoute: typeof EarnRoute
+  MarketMarketIdRoute: typeof MarketMarketIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/market/$marketId': {
+      id: '/market/$marketId'
+      path: '/market/$marketId'
+      fullPath: '/market/$marketId'
+      preLoaderRoute: typeof MarketMarketIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BorrowRoute: BorrowRoute,
   EarnRoute: EarnRoute,
+  MarketMarketIdRoute: MarketMarketIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
