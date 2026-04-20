@@ -1,8 +1,16 @@
-import { getAccessToken } from "@privy-io/react-auth";
+const BASE_URL = import.meta.env.VITE_API_URL ?? "";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+let _token: string | null = null;
 
-class ApiError extends Error {
+export function setToken(token: string | null) {
+	_token = token;
+}
+
+export function getToken(): string | null {
+	return _token;
+}
+
+export class ApiError extends Error {
 	constructor(
 		public status: number,
 		public body: unknown,
@@ -11,33 +19,20 @@ class ApiError extends Error {
 	}
 }
 
-async function getToken(): Promise<string> {
-	const token = await getAccessToken();
-	if (!token) {
-		throw new ApiError(401, { message: "No access token" });
-	}
-	return token;
-}
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+	const headers: Record<string, string> = {
+		"Content-Type": "application/json",
+		...((options.headers as Record<string, string>) ?? {}),
+	};
 
-async function request<T>(
-	path: string,
-	options: RequestInit = {},
-	isRetry = false,
-): Promise<T> {
-	const token = await getToken();
+	if (_token) {
+		headers.Authorization = `Bearer ${_token}`;
+	}
 
 	const response = await fetch(`${BASE_URL}${path}`, {
 		...options,
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
-			...options.headers,
-		},
+		headers,
 	});
-
-	if (response.status === 401 && !isRetry) {
-		return request<T>(path, options, true);
-	}
 
 	if (!response.ok) {
 		const body = await response.json().catch(() => null);
@@ -50,10 +45,10 @@ async function request<T>(
 export const api = {
 	get: <T>(path: string) => request<T>(path),
 
-	post: <T>(path: string, body: unknown) =>
+	post: <T>(path: string, body?: unknown) =>
 		request<T>(path, {
 			method: "POST",
-			body: JSON.stringify(body),
+			body: body ? JSON.stringify(body) : undefined,
 		}),
 
 	patch: <T>(path: string, body: unknown) =>
@@ -62,5 +57,3 @@ export const api = {
 			body: JSON.stringify(body),
 		}),
 };
-
-export { ApiError };
