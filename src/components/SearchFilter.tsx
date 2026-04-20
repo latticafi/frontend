@@ -19,7 +19,7 @@ export function SearchFilter({
 				placeholder={placeholder}
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
-				className="pl-9 bg-secondary border-white/[0.06]"
+				className="pl-9 bg-secondary border-white/6"
 			/>
 		</div>
 	);

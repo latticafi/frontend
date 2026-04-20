@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { WalletButton } from "@/components/WalletButton";
 import { cn } from "@/lib/utils";
@@ -30,19 +30,18 @@ export function Navbar() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	return (
-		<header className="sticky top-0 z-50 h-16 border-b border-white/[0.04] bg-background/80 backdrop-blur-md">
+		<header className="sticky top-0 z-50 h-16 border-b border-white/4 bg-background/80 backdrop-blur-md">
 			<nav className="flex h-full items-center justify-between px-5 md:px-8">
 				<div className="flex items-center gap-5">
-					<button
-						type="button"
-						className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-white/[0.03]"
+					<Link
+						to="/"
+						className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-white/3"
 					>
 						<img src="/logo.svg" alt="Lattica" className="h-7 w-7 rounded-md" />
 						<span className="text-[17px] font-semibold tracking-tight">
 							Lattica
 						</span>
-						<ChevronDown className="size-3.5 text-muted-foreground" />
-					</button>
+					</Link>
 
 					<div className="hidden items-center gap-1 md:flex">
 						{NAV_LINKS.map((link) => (
@@ -52,12 +51,6 @@ export function Navbar() {
 				</div>
 
 				<div className="flex items-center gap-4">
-					<button
-						type="button"
-						className="hidden text-[15px] font-medium text-muted-foreground transition-colors hover:text-foreground md:inline-block"
-					>
-						Dashboard
-					</button>
 					<WalletButton />
 					<button
 						type="button"
@@ -75,16 +68,10 @@ export function Navbar() {
 			</nav>
 
 			{mobileMenuOpen && (
-				<div className="flex flex-col gap-1 border-b border-white/[0.04] bg-background/95 px-4 py-3 backdrop-blur-sm md:hidden">
+				<div className="flex flex-col gap-1 border-b border-white/4 bg-background/95 px-4 py-3 backdrop-blur-sm md:hidden">
 					{NAV_LINKS.map((link) => (
 						<TabLink key={link.to} to={link.to} label={link.label} />
 					))}
-					<button
-						type="button"
-						className="rounded-xl px-5 py-2 text-left text-[15px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-					>
-						Dashboard
-					</button>
 				</div>
 			)}
 		</header>
