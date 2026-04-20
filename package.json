@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "vlt run -- vite dev --port 3000",
-    "build": "vlt run -- vite build",
+    "build": "vite build",
     "preview": "vlt run -- vite preview",
     "test": "vitest run",
     "format": "biome format",
