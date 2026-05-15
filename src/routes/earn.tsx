@@ -150,11 +150,11 @@ function EarnPage() {
 							label="Utilization"
 							value={formatUtil(pool.utilization)}
 						/>
-						<StatCard
-							label="Current Rate"
-							value={formatBps(pool.currentRate)}
-							sub="APY on deposits"
-						/>
+						{/* <StatCard */}
+						{/* 	label="Current Rate" */}
+						{/* 	value={formatBps(pool.currentRate)} */}
+						{/* 	sub="APY on deposits" */}
+						{/* /> */}
 					</div>
 
 					{token && balance && (

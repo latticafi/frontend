@@ -1,3 +1,10 @@
+allowBuilds:
+  bufferutil: set this to true or false
+  esbuild: true
+  msw: true
+  sharp: true
+  utf-8-validate: set this to true or false
+  workerd: true
 onlyBuiltDependencies:
   - '@reown/appkit'
   - bufferutil
