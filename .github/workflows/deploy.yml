@@ -30,7 +30,7 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - uses: hashicorp/vault-action@v3
+      - uses: hashicorp/vault-action@v4
         with:
           url: ${{ secrets.VAULT_ADDR }}
           method: jwt
@@ -78,7 +78,7 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - uses: hashicorp/vault-action@v3
+      - uses: hashicorp/vault-action@v4
         with:
           url: ${{ secrets.VAULT_ADDR }}
           method: jwt
